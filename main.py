@@ -1,146 +1,134 @@
 import os
 import re
 import json
-import time
-from urllib.parse import urljoin
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
-from weasyprint import HTML
+import pypandoc
+from urllib.parse import urlparse
+import zipfile
+import shutil
+import os
+from lxml import etree
 
-# ============================
-# Parte 1: Converter pages.txt para JSON
-# ============================
+# --- Parte 1: Construir o mapeamento de URLs para âncoras ---
 
-def parse_pages_txt(filename):
-    with open(filename, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    
-    data = {}
-    current_category = None
-    stack = []         # Guarda os títulos dos níveis atuais
-    indent_stack = []  # Guarda o nível de indentação de cada item no stack
+# Carrega o levantamento de URLs (assumindo que foi salvo em "urls.json")
+with open("urls.json", "r", encoding="utf-8") as f:
+    urls_data = json.load(f)
 
-    for line in lines:
-        line = line.rstrip("\n")
-        if not line.strip():
-            continue
-
-        # Calcular o número de espaços à esquerda (indent)
-        indent = len(line) - len(line.lstrip(" "))
-        stripped = line.lstrip(" ")
-
-        # Se a linha começar com "-" e NÃO contiver "[" assume-se que é um cabeçalho de categoria
-        if stripped.startswith("-") and "[" not in stripped:
-            cat = stripped[1:].strip()
-            current_category = cat
-            data[current_category] = {}
-            stack = []
-            indent_stack = []
-            continue
-
-        # Caso contrário, a linha deve conter um link no formato: - [Título](URL)
-        m = re.search(r'-\s*\[([^\]]+)\]\(([^)]+)\)', stripped)
-        if m:
-            title = m.group(1).strip()
-            url = m.group(2).strip()
-            level = indent // 4  # assumindo 4 espaços por nível
-
-            # Ajusta o stack para que seu comprimento seja igual ao nível atual
-            while indent_stack and indent_stack[-1] >= indent:
-                stack.pop()
-                indent_stack.pop()
-            stack.append(title)
-            indent_stack.append(indent)
-            flat_title = " - ".join(stack)
-            if current_category is not None:
-                data[current_category][flat_title] = url
-        else:
-            continue
-
-    return data
-
-# Converte o arquivo "pages.txt" para JSON (estrutura de dicionário)
-pages_data = parse_pages_txt("pages.txt")
-
-# Salva o JSON em "urls.json" (opcional)
-with open("urls.json", "w", encoding="utf-8") as f:
-    json.dump(pages_data, f, ensure_ascii=False, indent=4)
-
-print("JSON gerado:")
-print(json.dumps(pages_data, ensure_ascii=False, indent=4))
-
-# ============================
-# Parte 2: Webscraping e geração de PDFs
-# ============================
-
-# Configura o Selenium (Chrome em modo headless)
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
-driver = webdriver.Chrome(options=chrome_options)
-
-# Cria o diretório para salvar os PDFs, se não existir
-output_dir = "pdf_pages"
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
-
-def get_main_content(html):
-    """Extrai e retorna o conteúdo da div com a classe 'content'. Se não encontrada, retorna uma string vazia."""
-    soup = BeautifulSoup(html, "html.parser")
-    content_div = soup.find("div", class_="content")
-    if content_div:
-        # Remove tags <link> e <style> que possam interferir
-        for tag in content_div.find_all(["link", "style"]):
-            tag.decompose()
-        return content_div.decode_contents()
-    else:
-        return ""
-
-# CSS customizado para formatação do PDF
-custom_css = """
-@page { margin: 1in !important; }
-body { margin: 0 !important; font-family: sans-serif !important; }
-table { border-collapse: collapse !important; width: 100% !important; margin-bottom: 1em !important; }
-table, th, td { border: 1px solid #000 !important; }
-th, td { padding: 8px !important; text-align: left !important; word-wrap: break-word !important; }
-"""
-
-pdf_index = 1
-
-# Itera sobre o levantamento e gera um PDF para cada URL
-for category, pages in pages_data.items():
+# "Achata" o JSON preservando a ordem (Python 3.7+ mantém a ordem de inserção)
+flattened_urls = []
+for category, pages in urls_data.items():
     for title, url in pages.items():
-        try:
-            print(f"Processando: {title} - {url}")
-            driver.get(url)
-            time.sleep(2)  # Aguarda o carregamento completo da página
-            page_source = driver.page_source
-            content = get_main_content(page_source)
-            if not content:
-                print(f"Nenhum conteúdo encontrado em: {url}")
-                continue
+        flattened_urls.append(url)
 
-            html_content = f"""<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>{title}</title>
-    <style>{custom_css}</style>
-</head>
-<body>
-    {content}
-</body>
-</html>
-"""
-            # Cria um nome de arquivo seguro para o PDF (remove caracteres inválidos)
-            safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in title)
-            pdf_filename = os.path.join(output_dir, f"{pdf_index:02d}_{safe_title}.pdf")
-            HTML(string=html_content, base_url=url).write_pdf(pdf_filename)
-            print(f"PDF gerado: {pdf_filename}")
-            pdf_index += 1
-        except Exception as e:
-            print(f"Erro ao processar {url}: {e}")
+# Cria um mapeamento: URL -> âncora (ex.: section_1, section_2, ...)
+url_to_anchor = {}
+for idx, url in enumerate(flattened_urls, start=1):
+    url_to_anchor[url] = f"section_{idx}"
 
-driver.quit()
+# --- Parte 2: Converter cada DOCX em HTML, inserir âncoras e concatenar ---
+docx_dir = "docx_pages/"  # Diretório onde estão os DOCX individuais
+# Ordena os arquivos DOCX; pressupõe-se que a ordem corresponda à do JSON achatado
+docx_files = sorted([f for f in os.listdir(docx_dir) if f.lower().endswith('.docx')])
+
+merged_html = "<html><head><meta charset='utf-8'><title>Merged Document</title></head><body>"
+
+for idx, filename in enumerate(docx_files, start=1):
+    filepath = os.path.join(docx_dir, filename)
+    # Converte o DOCX para HTML usando pypandoc
+    html_content = pypandoc.convert_file(filepath, 'html')
+    # Insere uma âncora logo após a tag <body>
+    anchor = f"section_{idx}"
+    html_content = re.sub(r'(<body[^>]*>)', r'\1<a id="' + anchor + r'"></a>', html_content, count=1, flags=re.IGNORECASE)
+    merged_html += html_content
+
+merged_html += "</body></html>"
+
+# --- Parte 3: Converter hyperlinks externos para links internos ---
+# Substitui links que comecem com uma das URLs do mapeamento por links internos apontando para a âncora correspondente.
+def replace_link(match):
+    href = match.group(1)
+    for orig_url, anchor in url_to_anchor.items():
+        if href.startswith(orig_url):
+            return f'<a href="#{anchor}"'
+    return match.group(0)
+
+merged_html = re.sub(r'<a\s+href="([^"]+)"', replace_link, merged_html)
+
+# Salva o HTML final para conferência (opcional)
+with open("merged.html", "w", encoding="utf-8") as f:
+    f.write(merged_html)
+
+# --- Parte 4: Converter o HTML final para DOCX ---
+output_docx = "archer_saas_documentation_athena_v4_sorted.docx"
+pypandoc.convert_file("merged.html", 'docx', outputfile=output_docx)
+print("Merged DOCX generated:", output_docx)
+
+def remove_external_hyperlinks(docx_path, output_path):
+    # Cria um diretório temporário para extrair o DOCX
+    temp_dir = "temp_docx"
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
+    
+    # Extrai o conteúdo do DOCX (é um arquivo ZIP)
+    with zipfile.ZipFile(docx_path, 'r') as zip_ref:
+        zip_ref.extractall(temp_dir)
+    
+    # Caminhos para os arquivos XML principais
+    document_xml = os.path.join(temp_dir, "word", "document.xml")
+    rels_xml = os.path.join(temp_dir, "word", "_rels", "document.xml.rels")
+    
+    # Parseia o arquivo de relações
+    parser = etree.XMLParser(remove_blank_text=True)
+    rels_tree = etree.parse(rels_xml, parser)
+    nsmap_rels = {"r": "http://schemas.openxmlformats.org/package/2006/relationships"}
+    
+    # Cria um dicionário com os r:id e seus targets externos (aqueles que começam com "http")
+    external_rels = {}
+    for rel in rels_tree.xpath("//r:Relationship", namespaces=nsmap_rels):
+        rId = rel.get("Id")
+        target = rel.get("Target")
+        if target and target.startswith("http"):
+            external_rels[rId] = target
+    
+    # Parseia o documento principal
+    doc_tree = etree.parse(document_xml, parser)
+    ns = {
+        'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+        'r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+    }
+    
+    # Para cada hyperlink com um r:id que esteja em external_rels,
+    # substituímos o elemento pelo seu conteúdo interno (mantendo o texto e formatação)
+    hyperlinks = doc_tree.xpath("//w:hyperlink[@r:id]", namespaces=ns)
+    for hyperlink in hyperlinks:
+        rId = hyperlink.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
+        if rId in external_rels:
+            parent = hyperlink.getparent()
+            index = parent.index(hyperlink)
+            for child in list(hyperlink):
+                parent.insert(index, child)
+                index += 1
+            parent.remove(hyperlink)
+    
+    # Opcional: Remover os relacionamentos externos do arquivo rels
+    for rel in rels_tree.xpath("//r:Relationship", namespaces=nsmap_rels):
+        rId = rel.get("Id")
+        if rId in external_rels:
+            rel.getparent().remove(rel)
+    
+    # Salva as modificações nos arquivos XML
+    doc_tree.write(document_xml, pretty_print=True, xml_declaration=True, encoding="UTF-8")
+    rels_tree.write(rels_xml, pretty_print=True, xml_declaration=True, encoding="UTF-8")
+    
+    # Recria o DOCX com o conteúdo modificado
+    with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as docx_zip:
+        for foldername, subfolders, filenames in os.walk(temp_dir):
+            for filename in filenames:
+                file_path = os.path.join(foldername, filename)
+                arcname = os.path.relpath(file_path, temp_dir)
+                docx_zip.write(file_path, arcname)
+    
+    # Remove o diretório temporário
+    shutil.rmtree(temp_dir)
+    print(f"Novo DOCX gerado: {output_path}")
