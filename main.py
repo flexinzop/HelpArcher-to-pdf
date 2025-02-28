@@ -25,7 +25,7 @@ for idx, url in enumerate(flattened_urls, start=1):
     url_to_anchor[url] = f"section_{idx}"
 
 # --- Parte 2: Converter cada DOCX em HTML, inserir âncoras e concatenar ---
-docx_dir = "docx_pages/"  # Diretório onde estão os DOCX individuais
+docx_dir = "docx_pages_solutions/"  # Diretório onde estão os DOCX individuais
 # Ordena os arquivos DOCX; pressupõe-se que a ordem corresponda à do JSON achatado
 docx_files = sorted([f for f in os.listdir(docx_dir) if f.lower().endswith('.docx')])
 
