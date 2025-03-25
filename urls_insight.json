@@ -1,0 +1,24 @@
+{
+    "Archer Insight": {
+        "Archer Insight": "https://help.archerirm.cloud/insight_61301/Content/Insight/archer_insight.htm",
+        "Archer Insight Release Notes": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_RN.htm",
+        "Archer Insight Use Case Design": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_design.htm",
+        "Understanding Qualitative vs. Quantitative": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_qual_to_quant.htm",
+        "Installing the Archer Insight Use Case": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_install.htm",
+        "Installing the Archer Insight Package": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_package_install.htm",
+        "Performing Use Case Cleanup Post-Installation": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_post_install_cleanup.htm",
+        "Setting Up Archer Insight Data Feeds": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_df_setting_up.htm",
+        "Configuring Archer Insight": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_setup_overview.htm",
+        "Configuring Links from Archer to Archer Insight": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_links_configuring.htm",
+        "Connecting to Archer Insight from an On-Premises Installation": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_connecting.htm",
+        "Using the Archer Insight Interface": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_ui.htm",
+        "Using the Dashboard": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_dashboard.htm",
+        "Using the Risk Event Listing Page": "https://help.archerirm.cloud/insight_61301/Content/Insight/insight_listing_page.htm",
+        "Using Quantitative Assessments":"https://help.archerirm.cloud/insight_61301/Content/Insight/insight_quant_assessments.htm",
+        "Using Assessment Type: Actual":"https://help.archerirm.cloud/insight_61301/Content/Insight/insight_assess_actual.htm",
+        "Using Assessment Type: Actual and Inherent":"https://help.archerirm.cloud/insight_61301/Content/Insight/insight_assess_actual_inherent.htm",
+        "Using Assessment Type: Control Specification":"https://help.archerirm.cloud/insight_61301/Content/Insight/insight_assess_control_spec.htm",
+        "Using the Relationship View":"https://help.archerirm.cloud/insight_61301/Content/Insight/insight_relationship_view.htm",
+        "Troubleshooting Archer Insight":"https://help.archerirm.cloud/insight_61301/Content/Insight/insight_troubleshooting.htm"
+    }
+}

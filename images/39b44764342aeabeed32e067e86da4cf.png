@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en" class="app-fill-viewport mc-material mc-base-theme mc-kingfisher-theme mc-portal-output mc-portal-output-custom-theme"><head>
+  <meta charset="utf-8">
+  <title>Secure Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <base href="/secure/">
+<style>*,*:before,*:after{box-sizing:border-box}html{font-size:62.5%}body{margin:0}html.app-fill-viewport,html.app-fill-viewport body{height:100%}.mc-kingfisher-theme body{font:400 1.4rem/1.215 Roboto,Helvetica Neue,sans-serif;letter-spacing:normal;color:#505050;background:white}@media screen and (-ms-high-contrast: active),(-ms-high-contrast: none){.mc-modern-browser-support{display:flex!important;align-items:center;justify-content:center;margin:3rem 1rem;font:400 1.4rem/1.215 Roboto,Helvetica Neue,sans-serif;text-align:center}}</style><link rel="stylesheet" href="styles.49a86ef0de68d8c0.css" crossorigin="anonymous" integrity="sha384-ZR0Ch7Gsgk1pahDLYJN31WJeh70PoAPOZWv2zrAyNBvIao1sC2+QPz/L+k+XmmJp" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.49a86ef0de68d8c0.css"></noscript><script type="text/javascript">window.mcEnvironment={'madcapUrl':'https://www.madcapsoftware.com','collabApiUrl':'https://collab.madcapcentral.com/api','collabAuthorityUrl':'https://collab.madcapcentral.com/authority','centralApiBaseUri':'/secure','centralLoginPortalBaseUri':'https://madcapcentral.com/','centralApiSubdomainUri':'https://api.madcapcentral.com','collabSocketMaxHttpBufferSizeBytes':'1048576','signalrLoggingEnabled':false,'clientId':'MadCloudApp','centralPortalBaseUri':'https://madcapcentral.com/','subdomainPortal':false,'flareTextEditorDocMaxCharLength':'5242880','production':true,'centralConfirmSubdomain':'confirm','externalWebserverConfirmRedirect':true,};</script></head>
+<body class="mc-portal-output-body">
+  <mc-root></mc-root>
+
+  <div class="mc-modern-browser-support" style="display:none">
+    A modern browser is required to view this site. Please use the latest version of Chrome, Firefox, Safari, or Edge.
+  </div>
+
+  <noscript>
+    <div style="display: flex; align-items: center; justify-content: center; margin: 3rem 1rem; font: 400 1.4rem/1.215 Roboto, 'Helvetica Neue', sans-serif;">
+      JavaScript is required to login. Please enable JavaScript and reload the page.
+    </div>
+  </noscript>
+<script src="runtime.2658d2d0ade8b09b.js" type="module" crossorigin="anonymous" integrity="sha384-IyaZRvIIMEDRZiFPv3BIYE4NJC6wz42hYFVyI0D8DFBI3SCG0q20Qsmq52f622RB"></script><script src="polyfills.f7daeac49e3f8c82.js" type="module" crossorigin="anonymous" integrity="sha384-bHhBiCXsqfLW3wtL3DLk4UPYQ1VHjrWa+XeOufE3pmqjyVWbD+H4jqcvJCl1ZJkq"></script><script src="main.2e3ed1cf4522f56e.js" type="module" crossorigin="anonymous" integrity="sha384-G05Lnt0psJtgdkwViio7do7WxqS4WZhAQWNdjFo9ntWTkATk7vFJxEw79pusrp8I"></script>
+
+</body></html>

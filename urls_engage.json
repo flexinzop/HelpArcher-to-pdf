@@ -1,0 +1,12 @@
+{
+    "Gerenciamento de riscos de terceiros do Archer 6.13": {
+        "Gerenciamento de riscos de terceiros do Archer 6.13": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/ThirdPtyGov/tpg_tprm.htm",
+        "Design do caso de uso Gerenciamento de riscos de terceiros": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/ThirdPtyGov/tpg_tprm_design.htm",
+        "Usando o Gerenciamento de riscos de terceiros": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/ThirdPtyGov/tpg_tprm_using.htm",
+        "Instalando o Gerenciamento de riscos de terceiros": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/ThirdPtyGov/tpg_tprm_installing.htm",
+        "Instalando os pacotes do Gerenciamento de riscos de terceiros": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/ThirdPtyGov/tpg_tprm_package_install.htm",
+        "Executar limpeza de caso de uso após a instalação": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/uc_post_install_cleanup.htm",
+        "Configurando feeds de dados de Gerenciamento de riscos de terceiros": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Solutions/ThirdPtyGov/tpg_tprm_df_setting_up.htm",
+        "Exemplos de mensagens de registro de instalação do pacote": "https://help.archerirm.cloud/thirdpty_riskmgmt_613/pt-br/Content/Resources/GlobalTopics/gt_install_pkgr_install_msgs.htm"
+    }
+}
